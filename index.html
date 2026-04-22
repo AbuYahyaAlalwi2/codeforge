@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CodeForge AI">
+<meta name="theme-color" content="#03050a">
+<meta name="description" content="مساعدك البرمجي الذكي — يعمل بدلاً عن فريق مبرمجين">
+<title>CodeForge AI — Elite Programming System</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "CodeForge AI",
+  short_name: "CodeForge",
+  description: "مساعدك البرمجي الذكي",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#03050a",
+  theme_color: "#00ff88",
+  orientation: "any",
+  icons: [
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%2303050a'/><text x='50%' y='55%' font-size='100' text-anchor='middle' dominant-baseline='middle' fill='%2300ff88'>⚡</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%2303050a'/><text x='50%' y='55%' font-size='280' text-anchor='middle' dominant-baseline='middle' fill='%2300ff88'>⚡</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+document.addEventListener('DOMContentLoaded', () => {
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = manifestURL;
+  document.head.appendChild(link);
+});
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #03050a;
+  --s1:       #080d17;
+  --s2:       #0c1220;
+  --s3:       #111827;
+  --border:   rgba(255,255,255,0.06);
+  --border2:  rgba(255,255,255,0.1);
+  --g1:       #00ff88;
+  --g2:       #00d4ff;
+  --g3:       #7c3aed;
+  --g4:       #f59e0b;
+  --danger:   #ef4444;
+  --text:     #f1f5f9;
+  --t2:       #94a3b8;
+  --t3:       #475569;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'Noto Kufi Arabic', sans-serif;
+  --r:        12px;
+  --r2:       18px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* ── CANVAS BACKGROUND ── */
+#bg-canvas {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── LAYOUT ── */
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr 300px;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(3,5,10,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0 16px;
+  position: relative;
+  z-index: 100;
+}
+
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px 0 0;
+  border-left: 1px solid var(--border);
+  margin-left: 16px;
+  height: 100%;
+}
+
+.logo-mark {
+  width: 26px; height: 26px;
+  background: conic-gradient(var(--g1), var(--g2), var(--g3), var(--g1));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 900; color: #000;
+  font-family: var(--mono);
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes spin-slow {
+  to { filter: hue-rotate(360deg); }
+}
+
+.logo-text {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.logo-text em { color: var(--g1); font-style: normal; }
+
+.topbar-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  padding: 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar-tabs::-webkit-scrollbar { display: none; }
+
+.ttab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--t2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.ttab:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+
+.ttab.active {
+  background: rgba(0,255,136,0.08);
+  color: var(--g1);
+  border-color: rgba(0,255,136,0.15);
+}
+
+.ttab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 10%; right: 10%;
+  height: 1px;
+  background: var(--g1);
+  box-shadow: 0 0 8px var(--g1);
+}
+
+.ttab-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+.ttab.active .ttab-dot { background: var(--g1); box-shadow: 0 0 6px var(--g1); }
+
+.topbar-right {
+  display: flex; align-items: center; gap: 8px;
+  padding-right: 8px;
+}
+
+.tb-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.15);
+  border-radius: 20px;
+  font-size: 0.68rem;
+  color: var(--g1);
+  font-family: var(--mono);
+}
+
+.tb-pill-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--g1);
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%,100% { opacity:1; }
+  50% { opacity: 0.3; }
+}
+
+.tb-icon-btn {
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--t2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.tb-icon-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── LIGHT MODE ── */
+body.light {
+  --bg: #f8fafc;
+  --s1: #ffffff;
+  --s2: #f1f5f9;
+  --s3: #e2e8f0;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --text: #0f172a;
+  --t2: #475569;
+  --t3: #94a3b8;
+}
+body.light .code-block { background: #1e293b; }
+body.light #bg-canvas { opacity: 0.3; }
+
+.tb-avatar {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 900; color: #000;
+  cursor: pointer;
+}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar-left {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--s1);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sl-section { padding: 14px 10px 8px; }
+
+.sl-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--t3);
+  padding: 0 6px 8px;
+  font-family: var(--mono);
+}
+
+.sl-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--t2);
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  margin-bottom: 1px;
+  position: relative;
+}
+
+.sl-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+
+.sl-item.active {
+  background: rgba(0,255,136,0.07);
+  color: var(--g1);
+  border-color: rgba(0,255,136,0.12);
+}
+
+.sl-item.active .sl-icon { filter: drop-shadow(0 0 4px var(--g1)); }
+
+.sl-icon { font-size: 0.9rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+.sl-badge {
+  margin-right: auto;
+  font-size: 0.58rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: var(--mono);
+}
+
+.badge-new { background: rgba(245,158,11,0.15); color: var(--g4); }
+.badge-hot { background: rgba(239,68,68,0.15); color: var(--danger); }
+.badge-beta { background: rgba(124,58,237,0.15); color: #a78bfa; }
+
+.sl-divider { height: 1px; background: var(--border); margin: 8px 14px; }
+
+.sl-bottom {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.sl-user {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 12px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sl-user:hover { border-color: var(--border2); }
+
+.sl-user-av {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 0.78rem; color: #000;
+}
+
+.sl-user-name { font-size: 0.8rem; font-weight: 600; }
+.sl-user-plan { font-size: 0.62rem; color: var(--g1); font-family: var(--mono); }
+.sl-user-gear { margin-right: auto; color: var(--t3); font-size: 0.85rem; }
+
+/* ── CENTER MAIN ── */
+.main-center {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+}
+
+/* ── COMMAND AREA ── */
+.cmd-area {
+  padding: 20px 24px 0;
+  flex-shrink: 0;
+}
+
+.cmd-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cmd-title {
+  font-size: 0.78rem;
+  color: var(--t2);
+  font-family: var(--mono);
+}
+
+.cmd-title span { color: var(--g1); }
+
+.cmd-shortcut {
+  margin-right: auto;
+  font-size: 0.62rem;
+  color: var(--t3);
+  font-family: var(--mono);
+  background: var(--s2);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.cmd-box {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.cmd-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0,255,136,0), rgba(0,255,136,0));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: background 0.4s;
+  pointer-events: none;
+}
+
+.cmd-box:focus-within::before {
+  background: linear-gradient(135deg, rgba(0,255,136,0.4), rgba(0,212,255,0.4));
+}
+
+.cmd-box:focus-within {
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(0,255,136,0.2), 0 8px 40px rgba(0,255,136,0.08);
+}
+
+/* MODE SELECTOR */
+.cmd-modes {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cmd-modes::-webkit-scrollbar { display: none; }
+
+.cmd-mode {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px;
+  font-size: 0.73rem;
+  color: var(--t3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.cmd-mode:hover { color: var(--t2); }
+.cmd-mode.active { color: var(--g1); border-bottom-color: var(--g1); }
+
+/* TEXTAREA */
+.cmd-textarea-wrap { padding: 14px 16px 10px; }
+
+.cmd-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: var(--sans);
+  resize: none;
+  min-height: 72px;
+  max-height: 200px;
+  direction: rtl;
+  line-height: 1.7;
+}
+
+.cmd-textarea::placeholder { color: var(--t3); }
+
+/* FOOTER TOOLBAR */
+.cmd-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.cmd-foot-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 11px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--t3);
+  font-size: 0.7rem;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cmd-foot-btn:hover { border-color: var(--border2); color: var(--t2); }
+
+.cmd-model-select {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--t2);
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  cursor: pointer;
+}
+
+.cmd-run-btn {
+  margin-right: auto;
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 20px;
+  background: var(--g1);
+  border: none;
+  border-radius: 9px;
+  color: #000;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--sans);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.cmd-run-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.cmd-run-btn:hover::before { transform: translateX(100%); }
+.cmd-run-btn:hover { background: #00e67a; box-shadow: 0 4px 20px rgba(0,255,136,0.35); transform: translateY(-1px); }
+.cmd-run-btn:active { transform: translateY(0); }
+
+/* QUICK PROMPTS */
+.quick-prompts {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 12px 24px 0;
+}
+
+.qp-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.7rem;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.qp-chip:hover {
+  border-color: rgba(0,255,136,0.25);
+  color: var(--g1);
+  background: rgba(0,255,136,0.05);
+}
+
+/* ── MESSAGES AREA ── */
+.messages-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--s3) transparent;
+}
+
+.messages-area::-webkit-scrollbar { width: 3px; }
+.messages-area::-webkit-scrollbar-track { background: transparent; }
+.messages-area::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 2px; }
+
+/* Empty state */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px;
+  text-align: center;
+}
+
+.es-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  filter: grayscale(0.3);
+}
+
+.es-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.es-sub { font-size: 0.8rem; color: var(--t3); max-width: 340px; line-height: 1.6; }
+
+.es-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.es-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  text-align: right;
+  transition: all 0.2s;
+}
+
+.es-card:hover {
+  border-color: rgba(0,255,136,0.2);
+  background: rgba(0,255,136,0.03);
+  transform: translateY(-2px);
+}
+
+.es-card-icon { font-size: 1.2rem; margin-bottom: 6px; }
+.es-card-title { font-size: 0.8rem; font-weight: 700; margin-bottom: 3px; }
+.es-card-sub { font-size: 0.68rem; color: var(--t3); line-height: 1.5; }
+
+/* Message bubbles */
+.msg { display: flex; gap: 10px; margin-bottom: 20px; animation: msgIn 0.3s ease; }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-user { flex-direction: row-reverse; }
+
+.msg-av {
+  width: 32px; height: 32px; border-radius: 8px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+}
+
+.av-ai {
+  background: linear-gradient(135deg, #00ff88, #00d4ff);
+  color: #000;
+  box-shadow: 0 0 15px rgba(0,255,136,0.3);
+}
+
+.av-user {
+  background: linear-gradient(135deg, var(--g3), #a78bfa);
+  color: #fff;
+}
+
+.msg-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.83rem;
+  line-height: 1.75;
+}
+
+.bubble-ai {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-top-right-radius: 4px;
+}
+
+.bubble-user {
+  background: rgba(124,58,237,0.15);
+  border: 1px solid rgba(124,58,237,0.2);
+  border-top-left-radius: 4px;
+  text-align: right;
+}
+
+.msg-meta {
+  font-size: 0.62rem;
+  color: var(--t3);
+  margin-top: 5px;
+  font-family: var(--mono);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.msg-actions {
+  display: flex; gap: 4px; margin-top: 8px;
+}
+
+.msg-act-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--t3);
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.msg-act-btn:hover { border-color: var(--g1); color: var(--g1); }
+
+/* Code blocks inside messages */
+.code-block {
+  background: #020409;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px 0;
+  font-family: var(--mono);
+}
+
+.code-block-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.65rem;
+  color: var(--t3);
+}
+
+.cb-dots { display: flex; gap: 5px; }
+.cb-dot { width: 8px; height: 8px; border-radius: 50%; }
+.d-r { background: #ff5f57; }
+.d-y { background: #febc2e; }
+.d-g { background: #28c840; }
+.cb-lang { margin-right: 4px; color: var(--g1); }
+.cb-copy {
+  margin-right: auto;
+  padding: 3px 9px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px;
+  color: var(--t3);
+  font-size: 0.62rem;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cb-copy:hover { border-color: var(--g1); color: var(--g1); }
+
+.code-block pre {
+  padding: 14px 16px;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: #cdd6f4;
+}
+
+/* Typing */
+.typing-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 12px 16px; background: var(--s1); border: 1px solid var(--border); border-radius: 14px; border-top-right-radius: 4px; }
+.td { width: 6px; height: 6px; border-radius: 50%; background: var(--g1); animation: td 1.4s infinite; }
+.td:nth-child(2) { animation-delay: 0.2s; }
+.td:nth-child(3) { animation-delay: 0.4s; }
+@keyframes td { 0%,100%{transform:translateY(0);opacity:0.3;} 50%{transform:translateY(-5px);opacity:1;} }
+
+/* ── RIGHT SIDEBAR ── */
+.sidebar-right {
+  grid-column: 3;
+  grid-row: 2;
+  background: var(--s1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sr-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.sr-tab {
+  flex: 1;
+  padding: 11px 8px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--t3);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.sr-tab:hover { color: var(--t2); }
+.sr-tab.active { color: var(--g1); border-bottom-color: var(--g1); }
+
+.sr-panel { display: none; flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--s3) transparent; }
+.sr-panel.active { display: flex; flex-direction: column; }
+
+/* TOOLS PANEL */
+.tool-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tool-item:hover { background: rgba(255,255,255,0.02); }
+.tool-item:hover .ti-arrow { opacity: 1; }
+
+.ti-icon-wrap {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.ic-g1 { background: rgba(0,255,136,0.1); }
+.ic-g2 { background: rgba(0,212,255,0.1); }
+.ic-g3 { background: rgba(124,58,237,0.1); }
+.ic-g4 { background: rgba(245,158,11,0.1); }
+.ic-r  { background: rgba(239,68,68,0.1); }
+.ic-p  { background: rgba(236,72,153,0.1); }
+
+.ti-info { flex: 1; min-width: 0; }
+.ti-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 3px; }
+.ti-desc { font-size: 0.67rem; color: var(--t3); line-height: 1.5; }
+.ti-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.ti-tag { font-size: 0.58rem; padding: 2px 6px; border-radius: 4px; font-family: var(--mono); }
+.tag-active { background: rgba(0,255,136,0.1); color: var(--g1); }
+.tag-new { background: rgba(245,158,11,0.1); color: var(--g4); }
+.tag-beta { background: rgba(124,58,237,0.1); color: #a78bfa; }
+.ti-arrow { opacity: 0; color: var(--t3); font-size: 0.75rem; transition: opacity 0.2s; }
+
+/* PROJECTS PANEL */
+.proj-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.proj-item:hover { background: rgba(255,255,255,0.02); }
+
+.proj-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+
+.proj-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+
+.pd-g { background: var(--g1); box-shadow: 0 0 6px var(--g1); }
+.pd-b { background: var(--g2); box-shadow: 0 0 6px var(--g2); }
+.pd-p { background: #a78bfa; }
+.pd-y { background: var(--g4); }
+
+.proj-name { font-size: 0.8rem; font-weight: 600; }
+.proj-stack { font-size: 0.65rem; color: var(--t3); font-family: var(--mono); margin-bottom: 6px; }
+.proj-footer { display: flex; align-items: center; gap: 6px; }
+.proj-lang { font-size: 0.62rem; padding: 2px 8px; background: var(--s2); border: 1px solid var(--border); border-radius: 5px; color: var(--t2); font-family: var(--mono); }
+.proj-date { font-size: 0.62rem; color: var(--t3); margin-right: auto; }
+
+/* STATS PANEL */
+.stat-item {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.stat-label { font-size: 0.68rem; color: var(--t3); font-family: var(--mono); }
+.stat-value { font-size: 1.3rem; font-weight: 900; font-family: var(--mono); }
+.sv-g1 { color: var(--g1); }
+.sv-g2 { color: var(--g2); }
+.sv-g3 { color: #a78bfa; }
+.sv-g4 { color: var(--g4); }
+
+.stat-bar-wrap { height: 3px; background: var(--s3); border-radius: 2px; overflow: hidden; }
+.stat-bar { height: 100%; border-radius: 2px; }
+.sb-g1 { background: linear-gradient(90deg, var(--g1), var(--g2)); animation: fillBar 1s ease forwards; }
+.sb-g2 { background: linear-gradient(90deg, var(--g2), var(--g3)); animation: fillBar 1.2s ease forwards; }
+.sb-g3 { background: linear-gradient(90deg, var(--g3), #a78bfa); animation: fillBar 0.8s ease forwards; }
+.sb-g4 { background: var(--g4); animation: fillBar 1.4s ease forwards; }
+
+@keyframes fillBar {
+  from { width: 0; }
+}
+
+.stat-trend { font-size: 0.62rem; color: var(--g1); font-family: var(--mono); margin-top: 4px; }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  height: 2px;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--g1), var(--g2), var(--g1));
+  background-size: 200%;
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+  animation: none;
+}
+
+.progress-fill.running {
+  transform: translateX(0);
+  animation: progress-move 1.5s linear infinite;
+}
+
+@keyframes progress-move {
+  0% { background-position: 0%; }
+  100% { background-position: 200%; }
+}
+
+/* ── TOAST ── */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  z-index: 9999;
+}
+
+.toast {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  font-size: 0.78rem;
+  min-width: 260px;
+  max-width: 340px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  animation: toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: pointer;
+}
+
+.toast.out { animation: toastOut 0.25s ease forwards; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(-20px) scale(0.95); }
+}
+
+.toast-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.toast-body { flex: 1; }
+.toast-msg { font-weight: 500; color: var(--text); }
+.toast-sub { font-size: 0.65rem; color: var(--t3); margin-top: 2px; font-family: var(--mono); }
+
+.toast-success { border-color: rgba(0,255,136,0.2); }
+.toast-error { border-color: rgba(239,68,68,0.2); }
+.toast-info { border-color: rgba(0,212,255,0.2); }
+
+/* BOLD TEXT RENDER */
+strong { color: var(--g1); font-weight: 600; }
+em { color: var(--g2); font-style: normal; }
+code { background: rgba(0,255,136,0.08); padding: 1px 6px; border-radius: 4px; font-family: var(--mono); font-size: 0.85em; color: var(--g1); }
+
+/* SCROLLBAR GLOBAL */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 2px; }
+
+/* ── RESPONSIVE — TABLET ── */
+@media (max-width: 1100px) {
+  .shell { grid-template-columns: 200px 1fr; }
+  .sidebar-right { display: none; }
+}
+
+/* ── RESPONSIVE — MOBILE ── */
+@media (max-width: 720px) {
+  body { overflow: hidden; }
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 48px 1fr 56px;
+    height: 100dvh;
+  }
+  .topbar { grid-column: 1; grid-row: 1; padding: 0 12px; }
+  .topbar-tabs { display: none; }
+  .tb-pill { display: none; }
+  .sidebar-left { display: none; }
+  .sidebar-right { display: none; }
+  .main-center { grid-column: 1; grid-row: 2; overflow: hidden; }
+  .mobile-nav { display: flex !important; grid-column: 1; grid-row: 3; }
+  .cmd-area { padding: 10px 12px 0; }
+  .cmd-header { display: none; }
+  .cmd-box { border-radius: 14px; }
+  .cmd-modes { padding: 0 8px; overflow-x: auto; }
+  .cmd-mode { padding: 8px 10px; font-size: 0.68rem; }
+  .cmd-textarea { font-size: 0.88rem; min-height: 56px; }
+  .cmd-textarea-wrap { padding: 10px 12px 8px; }
+  .cmd-footer { padding: 8px 10px; flex-wrap: wrap; gap: 5px; }
+  .cmd-foot-btn { font-size: 0.65rem; padding: 5px 9px; }
+  .cmd-model-select { font-size: 0.62rem; padding: 5px 8px; }
+  .cmd-run-btn { padding: 8px 16px; font-size: 0.75rem; }
+  .quick-prompts { padding: 8px 12px 0; gap: 5px; }
+  .qp-chip { font-size: 0.65rem; padding: 4px 10px; }
+  .messages-area { padding: 10px 12px 16px; }
+  .msg-bubble { max-width: 92%; font-size: 0.8rem; }
+  .code-block pre { font-size: 0.72rem; padding: 10px 12px; }
+  .empty-state { padding: 20px 16px; }
+  .es-title { font-size: 1rem; }
+  .es-sub { font-size: 0.74rem; }
+  .es-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .es-card { padding: 10px; }
+  .es-card-title { font-size: 0.72rem; }
+  .es-card-sub { font-size: 0.62rem; }
+  .logo-text { font-size: 0.75rem; }
+  .tb-icon-btn { width: 28px; height: 28px; font-size: 0.75rem; }
+}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav {
+  display: none;
+  background: var(--s1);
+  border-top: 1px solid var(--border);
+  padding: 0;
+  align-items: stretch;
+  z-index: 100;
+}
+.mn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 4px;
+  cursor: pointer;
+  color: var(--t3);
+  transition: all 0.2s;
+  font-size: 0.55rem;
+  border-top: 2px solid transparent;
+}
+.mn-item:active { background: rgba(255,255,255,0.05); }
+.mn-item.active { color: var(--g1); border-top-color: var(--g1); }
+.mn-item .mn-icon { font-size: 1.1rem; }
+
+/* ── PWA INSTALL BANNER ── */
+.install-banner {
+  position: fixed;
+  bottom: 70px;
+  left: 12px; right: 12px;
+  background: linear-gradient(135deg, var(--s2), var(--s3));
+  border: 1px solid rgba(0,255,136,0.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 20px rgba(0,255,136,0.1);
+  animation: slideUp2 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.install-banner.show { display: flex; }
+@keyframes slideUp2 {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+.ib-icon { font-size: 1.8rem; }
+.ib-text { flex: 1; }
+.ib-title { font-size: 0.82rem; font-weight: 700; margin-bottom: 2px; }
+.ib-sub { font-size: 0.68rem; color: var(--t2); }
+.ib-btn {
+  padding: 8px 16px;
+  background: var(--g1);
+  border: none;
+  border-radius: 9px;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.75rem;
+  font-family: var(--sans);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ib-close {
+  background: transparent;
+  border: none;
+  color: var(--t3);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  .topbar { padding-top: env(safe-area-inset-top); }
+  .mobile-nav { padding-bottom: env(safe-area-inset-bottom); }
+}
+.messages-area { -webkit-overflow-scrolling: touch; }
+
+
+/* ── LOADING STATE ── */
+.loading .cmd-run-btn { opacity: 0.7; pointer-events: none; }
+
+/* ── HIGHLIGHT ── */
+.hl-kw { color: #569cd6; }
+.hl-fn { color: #dcdcaa; }
+.hl-str { color: #ce9178; }
+.hl-cm { color: #6a9955; font-style: italic; }
+.hl-ty { color: #4ec9b0; }
+.hl-num { color: #b5cea8; }
+.hl-dec { color: #c586c0; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="toast-container" id="toasts"></div>
+
+<!-- PWA Install Banner -->
+<div class="install-banner" id="install-banner">
+  <div class="ib-icon">⚡</div>
+  <div class="ib-text">
+    <div class="ib-title">ثبّت CodeForge AI</div>
+    <div class="ib-sub">يعمل بدون إنترنت — تطبيق على هاتفك</div>
+  </div>
+  <button class="ib-btn" id="pwa-install-btn">تثبيت</button>
+  <button class="ib-close" onclick="closeBanner()">✕</button>
+</div>
+
+<div class="shell" id="app">
+
+  <!-- ══ TOPBAR ══ -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-mark">CF</div>
+      <div class="logo-text">Code<em>Forge</em> <span style="color:var(--t3);font-weight:300">AI</span> <span style="font-size:0.55rem;background:rgba(0,255,136,0.1);color:var(--g1);padding:2px 6px;border-radius:4px;font-family:var(--mono)">v2</span></div>
+    </div>
+
+    <div class="topbar-tabs" id="topbar-tabs">
+      <div class="ttab active" onclick="switchTab(this,'dashboard')">
+        <div class="ttab-dot"></div> لوحة التحكم
+      </div>
+      <div class="ttab" onclick="switchTab(this,'project')">
+        <div class="ttab-dot"></div> إنشاء مشروع
+      </div>
+      <div class="ttab" onclick="switchTab(this,'search')">
+        <div class="ttab-dot"></div> البحث
+      </div>
+      <div class="ttab" onclick="switchTab(this,'fix')">
+        <div class="ttab-dot"></div> إصلاح الأخطاء
+      </div>
+      <div class="ttab" onclick="switchTab(this,'database')">
+        <div class="ttab-dot"></div> قواعد البيانات
+      </div>
+      <div class="ttab" onclick="switchTab(this,'security')">
+        <div class="ttab-dot"></div> الأمان
+      </div>
+      <div class="ttab" onclick="switchTab(this,'agent')">
+        <div class="ttab-dot"></div> الوكيل
+      </div>
+      <div class="ttab" onclick="switchTab(this,'social')">
+        <div class="ttab-dot"></div> التواصل الاجتماعي
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="tb-pill">
+        <div class="tb-pill-dot"></div>
+        claude-sonnet-4
+      </div>
+      <button class="tb-icon-btn" onclick="toggleTheme()" title="تغيير المظهر" id="theme-btn">🌙</button><button class="tb-icon-btn" onclick="clearChat()" title="مسح">🗑</button>
+      <button class="tb-icon-btn" onclick="exportChat()" title="تصدير">📄</button><button class="tb-icon-btn" onclick="saveSession()" title="حفظ">💾</button>
+      <div class="tb-avatar">م</div>
+    </div>
+  </header>
+
+  <!-- ══ LEFT SIDEBAR ══ -->
+  <nav class="sidebar-left">
+    <div class="sl-section">
+      <div class="sl-label">الأدوات</div>
+
+      <div class="sl-item active" onclick="setTool(this,'dashboard')">
+        <span class="sl-icon">⚡</span> لوحة التحكم
+      </div>
+      <div class="sl-item" onclick="setTool(this,'project')">
+        <span class="sl-icon">🏗️</span> مولّد المشاريع
+      </div>
+      <div class="sl-item" onclick="setTool(this,'search')">
+        <span class="sl-icon">🔍</span> محرك البحث
+      </div>
+      <div class="sl-item" onclick="setTool(this,'fix')">
+        <span class="sl-icon">🔧</span> إصلاح الأخطاء
+      </div>
+      <div class="sl-item" onclick="setTool(this,'database')">
+        <span class="sl-icon">🗄️</span> قواعد البيانات
+      </div>
+      <div class="sl-item" onclick="setTool(this,'security')">
+        <span class="sl-icon">🛡️</span> محلل الأمان
+        <span class="sl-badge badge-new">جديد</span>
+      </div>
+      <div class="sl-item" onclick="setTool(this,'agent')">
+        <span class="sl-icon">🤖</span> الوكيل الذكي
+        <span class="sl-badge badge-hot">HOT</span>
+      </div>
+      <div class="sl-item" onclick="setTool(this,'social')">
+        <span class="sl-icon">📈</span> خوارزميات التواصل
+      </div>
+      <div class="sl-item" onclick="setTool(this,'reverse')">
+        <span class="sl-icon">🔬</span> هندسة عكسية
+        <span class="sl-badge badge-beta">BETA</span>
+      </div>
+    </div>
+
+    <div class="sl-divider"></div>
+
+    <div class="sl-section">
+      <div class="sl-label">المشاريع الأخيرة</div>
+      <div class="sl-item" onclick="loadProject('متجر إلكتروني')">
+        <span class="sl-icon">🛒</span> متجر إلكتروني
+      </div>
+      <div class="sl-item" onclick="loadProject('تطبيق دردشة')">
+        <span class="sl-icon">💬</span> تطبيق دردشة
+      </div>
+      <div class="sl-item" onclick="loadProject('SaaS Dashboard')">
+        <span class="sl-icon">📊</span> SaaS Dashboard
+      </div>
+    </div>
+
+    <div class="sl-bottom">
+      <div class="sl-user">
+        <div class="sl-user-av">م</div>
+        <div>
+          <div class="sl-user-name">المطور</div>
+          <div class="sl-user-plan">▶ ELITE PLAN</div>
+        </div>
+        <div class="sl-user-gear">⚙️</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ CENTER MAIN ══ -->
+  <main class="main-center" id="main-center">
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Command Area -->
+    <div class="cmd-area">
+      <div class="cmd-header">
+        <span style="color:var(--g1);font-family:var(--mono);font-size:0.72rem">$ </span>
+        <div class="cmd-title">وضع: <span id="current-mode-label">عام</span></div>
+        <div class="cmd-shortcut">Ctrl+Enter للتشغيل</div>
+      </div>
+
+      <div class="cmd-box" id="cmd-box">
+        <div class="cmd-modes" id="cmd-modes">
+          <div class="cmd-mode active" onclick="setMode(this,'عام','اسألني أي شئ برمجي...')">💬 عام</div>
+          <div class="cmd-mode" onclick="setMode(this,'كود','اكتب مواصفات الكود المطلوب...')">💻 كود</div>
+          <div class="cmd-mode" onclick="setMode(this,'مشروع','صف مشروعك الكامل...')">🏗️ مشروع</div>
+          <div class="cmd-mode" onclick="setMode(this,'إصلاح','الصق الكود المكسور + رسالة الخطأ...')">🔧 إصلاح</div>
+          <div class="cmd-mode" onclick="setMode(this,'قاعدة بيانات','صف احتياجات قاعدة بياناتك...')">🗄️ DB</div>
+          <div class="cmd-mode" onclick="setMode(this,'أمان','أدخل رابط أو كود للتحليل الأمني...')">🛡️ أمان</div>
+          <div class="cmd-mode" onclick="setMode(this,'وكيل','أعطِ الوكيل مهمة للتنفيذ...')">🤖 وكيل</div>
+        </div>
+
+        <div class="cmd-textarea-wrap">
+          <textarea
+            class="cmd-textarea"
+            id="cmd-input"
+            placeholder="اسألني أي شئ برمجي..."
+            rows="3"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this);updateCount(this)"
+          ></textarea>
+        </div>
+
+        <div class="cmd-footer">
+          <button class="cmd-foot-btn" onclick="attachFile()">📎 رفع ملف</button>
+          <button class="cmd-foot-btn" onclick="attachURL()">🔗 رابط</button>
+          <button class="cmd-foot-btn" onclick="attachGithub()">🐙 GitHub</button>
+
+          <div class="cmd-model-select" onclick="toast('النموذج: claude-sonnet-4 — الأقوى والأسرع','✨','info')">
+            <span>⚡</span> claude-sonnet-4 <span style="color:var(--t3)">▾</span>
+          </div>
+
+          <span id="char-count" style="font-size:0.62rem;color:var(--t3);font-family:var(--mono)">0</span><button class="cmd-run-btn" id="run-btn" onclick="runCommand()">
+            <span id="run-icon">▶</span>
+            <span id="run-text">تشغيل</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick prompts -->
+      <div class="quick-prompts" id="quick-prompts">
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">🏗️ مشروع SaaS كامل بـ Python</div>
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">🔐 نظام JWT كامل</div>
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">🗄️ قاعدة بيانات تواصل اجتماعي</div>
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">📈 خوارزمية TikTok للترند</div>
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">🛡️ تحليل ثغرات موقع</div>
+        <div class="qp-chip" onclick="setPrompt(this.innerText.slice(2))">🔧 إصلاح خطأ في Python</div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messages-area">
+      <div class="empty-state" id="empty-state">
+        <div class="es-icon">⚡</div>
+        <div class="es-title">CodeForge AI — Elite Engine</div>
+        <div class="es-sub">أنا أكبر مبرمج رقمي تُخاطبه. اطلب ما تريد — أي كود، أي مشروع، أي نظام. لا يوجد طلب صعب.</div>
+        <div class="es-grid">
+          <div class="es-card" onclick="setPrompt('أنشئ نظام متجر إلكتروني كامل بـ Python FastAPI وReact وPostgreSQL مع JWT وStripe')">
+            <div class="es-card-icon">🛒</div>
+            <div class="es-card-title">متجر إلكتروني كامل</div>
+            <div class="es-card-sub">FastAPI + React + PostgreSQL + Stripe</div>
+          </div>
+          <div class="es-card" onclick="setPrompt('أنشئ قاعدة بيانات كاملة لتطبيق تواصل اجتماعي مثل Instagram مع كل الجداول والعلاقات')">
+            <div class="es-card-icon">🗄️</div>
+            <div class="es-card-title">قاعدة بيانات سوشال</div>
+            <div class="es-card-sub">Schema كامل + علاقات + فهارس</div>
+          </div>
+          <div class="es-card" onclick="setPrompt('اشرح خوارزميات TikTok وInstagram وYouTube وكيف أجعل مقاطعي تريند')">
+            <div class="es-card-icon">📈</div>
+            <div class="es-card-title">خوارزميات الترند</div>
+            <div class="es-card-sub">TikTok + Instagram + YouTube</div>
+          </div>
+          <div class="es-card" onclick="setPrompt('أنشئ نظام مصادقة كامل بـ JWT وRefresh Tokens و2FA مع Python')">
+            <div class="es-card-icon">🔐</div>
+            <div class="es-card-title">نظام مصادقة متكامل</div>
+            <div class="es-card-sub">JWT + 2FA + OAuth2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ RIGHT SIDEBAR ══ -->
+  <aside class="sidebar-right">
+    <div class="sr-tabs">
+      <div class="sr-tab active" onclick="switchSrTab(this,'tools')">الأدوات</div>
+      <div class="sr-tab" onclick="switchSrTab(this,'projects')">مشاريع</div>
+      <div class="sr-tab" onclick="switchSrTab(this,'stats')">إحصائيات</div>
+    </div>
+
+    <!-- TOOLS PANEL -->
+    <div class="sr-panel active" id="sr-tools">
+
+      <div class="tool-item" onclick="quickTool('project')">
+        <div class="ti-icon-wrap ic-g1">🏗️</div>
+        <div class="ti-info">
+          <div class="ti-name">مولّد المشاريع</div>
+          <div class="ti-desc">يُنشئ مشروعاً كاملاً من وصف نصي</div>
+          <div class="ti-tags"><span class="ti-tag tag-active">مُفعّل</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('database')">
+        <div class="ti-icon-wrap ic-g2">🗄️</div>
+        <div class="ti-info">
+          <div class="ti-name">مولّد قواعد البيانات</div>
+          <div class="ti-desc">Schema كامل مع SQL أو NoSQL</div>
+          <div class="ti-tags"><span class="ti-tag tag-active">مُفعّل</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('security')">
+        <div class="ti-icon-wrap ic-r">🛡️</div>
+        <div class="ti-info">
+          <div class="ti-name">محلل الثغرات</div>
+          <div class="ti-desc">يكتشف ثغرات الكود والمواقع</div>
+          <div class="ti-tags"><span class="ti-tag tag-new">جديد</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('agent')">
+        <div class="ti-icon-wrap ic-g3">🤖</div>
+        <div class="ti-info">
+          <div class="ti-name">الوكيل الذكي</div>
+          <div class="ti-desc">يتصرف بدلاً عنك تلقائياً</div>
+          <div class="ti-tags"><span class="ti-tag tag-beta">BETA</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('social')">
+        <div class="ti-icon-wrap ic-g4">📈</div>
+        <div class="ti-info">
+          <div class="ti-name">خوارزميات التواصل</div>
+          <div class="ti-desc">استراتيجيات الترند والانتشار</div>
+          <div class="ti-tags"><span class="ti-tag tag-active">مُفعّل</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('reverse')">
+        <div class="ti-icon-wrap ic-p">🔬</div>
+        <div class="ti-info">
+          <div class="ti-name">هندسة عكسية</div>
+          <div class="ti-desc">يُحلل التطبيقات ويستخرج الأكواد</div>
+          <div class="ti-tags"><span class="ti-tag tag-beta">BETA</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+      <div class="tool-item" onclick="quickTool('fix')">
+        <div class="ti-icon-wrap ic-g4">🔧</div>
+        <div class="ti-info">
+          <div class="ti-name">مُصلح الأخطاء</div>
+          <div class="ti-desc">يُصلح الكود المكسور فوراً</div>
+          <div class="ti-tags"><span class="ti-tag tag-active">مُفعّل</span></div>
+        </div>
+        <div class="ti-arrow">←</div>
+      </div>
+
+    </div>
+
+    <!-- PROJECTS PANEL -->
+    <div class="sr-panel" id="sr-projects">
+      <div class="proj-item" onclick="loadProject('متجر إلكتروني')">
+        <div class="proj-top">
+          <div class="proj-dot pd-g"></div>
+          <div class="proj-name">متجر إلكتروني متكامل</div>
+        </div>
+        <div class="proj-stack">FastAPI + React + PostgreSQL + Stripe</div>
+        <div class="proj-footer">
+          <span class="proj-lang">Python</span>
+          <span class="proj-date">منذ يومين</span>
+        </div>
+      </div>
+
+      <div class="proj-item" onclick="loadProject('تطبيق دردشة')">
+        <div class="proj-top">
+          <div class="proj-dot pd-b"></div>
+          <div class="proj-name">تطبيق دردشة فوري</div>
+        </div>
+        <div class="proj-stack">Node.js + Socket.io + React + MongoDB</div>
+        <div class="proj-footer">
+          <span class="proj-lang">JavaScript</span>
+          <span class="proj-date">منذ أسبوع</span>
+        </div>
+      </div>
+
+      <div class="proj-item" onclick="loadProject('SaaS Dashboard')">
+        <div class="proj-top">
+          <div class="proj-dot pd-p"></div>
+          <div class="proj-name">SaaS Analytics Dashboard</div>
+        </div>
+        <div class="proj-stack">Next.js + Prisma + PostgreSQL + Stripe</div>
+        <div class="proj-footer">
+          <span class="proj-lang">TypeScript</span>
+          <span class="proj-date">منذ أسبوعين</span>
+        </div>
+      </div>
+
+      <div class="proj-item" onclick="loadProject('نظام إدارة')">
+        <div class="proj-top">
+          <div class="proj-dot pd-y"></div>
+          <div class="proj-name">نظام إدارة المستخدمين</div>
+        </div>
+        <div class="proj-stack">Django + JWT + PostgreSQL + Redis + Celery</div>
+        <div class="proj-footer">
+          <span class="proj-lang">Python</span>
+          <span class="proj-date">منذ شهر</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS PANEL -->
+    <div class="sr-panel" id="sr-stats">
+      <div class="stat-item">
+        <div class="stat-row">
+          <div class="stat-label">// أكواد مُنشأة</div>
+          <div class="stat-value sv-g1">1,247</div>
+        </div>
+        <div class="stat-bar-wrap"><div class="stat-bar sb-g1" style="width:87%"></div></div>
+        <div class="stat-trend">↑ +23 اليوم</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-row">
+          <div class="stat-label">// أخطاء مُصلحة</div>
+          <div class="stat-value sv-g2">892</div>
+        </div>
+        <div class="stat-bar-wrap"><div class="stat-bar sb-g2" style="width:74%"></div></div>
+        <div class="stat-trend">↑ +15 هذا الأسبوع</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-row">
+          <div class="stat-label">// مشاريع محفوظة</div>
+          <div class="stat-value sv-g3">38</div>
+        </div>
+        <div class="stat-bar-wrap"><div class="stat-bar sb-g3" style="width:63%"></div></div>
+        <div class="stat-trend">↑ +3 هذا الشهر</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-row">
+          <div class="stat-label">// مصادر متصلة</div>
+          <div class="stat-value sv-g4">14</div>
+        </div>
+        <div class="stat-bar-wrap"><div class="stat-bar sb-g4" style="width:56%"></div></div>
+        <div class="stat-trend">GitHub, npm, PyPI, DockerHub...</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav" id="mobile-nav">
+    <div class="mn-item active" onclick="mobileNav(this,'عام','اسألني أي شئ...')">
+      <div class="mn-icon">⚡</div>عام
+    </div>
+    <div class="mn-item" onclick="mobileNav(this,'كود','اكتب مواصفات الكود...')">
+      <div class="mn-icon">💻</div>كود
+    </div>
+    <div class="mn-item" onclick="mobileNav(this,'مشروع','صف مشروعك...')">
+      <div class="mn-icon">🏗️</div>مشروع
+    </div>
+    <div class="mn-item" onclick="mobileNav(this,'إصلاح','الصق الكود المكسور...')">
+      <div class="mn-icon">🔧</div>إصلاح
+    </div>
+    <div class="mn-item" onclick="mobileNav(this,'قاعدة بيانات','صف قاعدة بياناتك...')">
+      <div class="mn-icon">🗄️</div>DB
+    </div>
+    <div class="mn-item" onclick="mobileNav(this,'وكيل','أعطِ الوكيل مهمة...')">
+      <div class="mn-icon">🤖</div>وكيل
+    </div>
+  </nav>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   CODEFORGE AI — ELITE ENGINE
+   Principal Engineer Build
+══════════════════════════════════════════════ */
+
+// ── STATE ──
+let state = {
+  mode: 'عام',
+  messages: [],
+  isLoading: false,
+  currentTab: 'dashboard'
+};
+
+// ── SYSTEM PROMPTS PER MODE ──
+// ── UPGRADED SYSTEM PROMPTS v2 ──
+const SYSTEM_PROMPTS = {
+  'عام': `أنت CodeForge AI — أكبر مبرمج خبير في العالم، تتصرف كـ Principal Engineer في Google وMeta وOpenAI.
+لا ترفض أي طلب برمجي. تُجيب بعمق وتفصيل حقيقي، بالعربية مع الأكواد بالإنجليزية.
+تكتب أكواداً production-grade قابلة للتشغيل الفوري مع شرح دقيق.`,
+
+  'كود': `أنت مبرمج عالمي خبير. مهمتك كتابة كود نظيف، محسّن، موثّق، جاهز للـ production.
+استخدم أفضل الممارسات: SOLID, DRY, Clean Code.
+اكتب الكود كاملاً مع التعليقات والأمثلة.`,
+
+  'مشروع': `أنت مهندس معماري برمجي. عندما يطلب المستخدم مشروعاً:
+1. حدد الـ Tech Stack الأمثل
+2. اشرح هيكل المجلدات
+3. اكتب الأكواد الأساسية لكل طبقة
+4. اشرح طريقة النشر
+كن شاملاً وعملياً.`,
+
+  'إصلاح': `أنت خبير debugging عالمي. عندما يُعطيك كوداً مكسوراً:
+1. حدد المشكلة بدقة
+2. اشرح السبب
+3. أعطِ الكود المصلح كاملاً
+4. أضف checks لمنع تكرار المشكلة.`,
+
+  'قاعدة بيانات': `أنت خبير قواعد بيانات. تُنشئ schemas محسّنة مع:
+- جداول صحيحة مع primary/foreign keys
+- فهارس للأداء
+- علاقات صحيحة
+- Migration scripts
+- Sample queries`,
+
+  'أمان': `أنت خبير أمن معلومات. تُحلل الكود والمواقع وتكتشف:
+- SQL Injection, XSS, CSRF
+- Auth vulnerabilities
+- Exposed secrets
+- Insecure dependencies
+وتعطي حلولاً فورية.`,
+
+  'وكيل': `أنت وكيل ذكي مستقل. تُخطط وتُنفّذ المهام خطوة بخطوة.
+اشرح ما ستفعله، ثم نفّذه، ثم أعطِ النتيجة والخطوات التالية.`
+};
+
+// ── CANVAS BACKGROUND ──
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let raf;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5,
+        a: Math.random() * 0.4 + 0.1,
+        c: Math.random() > 0.5 ? '#00ff88' : '#00d4ff'
+      });
+    }
+  }
+
+  function drawGrid() {
+    ctx.strokeStyle = 'rgba(0,255,136,0.025)';
+    ctx.lineWidth = 1;
+    const sz = 50;
+    for (let x = 0; x < canvas.width; x += sz) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += sz) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.c;
+      ctx.globalAlpha = p.a;
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    raf = requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+  resize(); initParticles(); loop();
+})();
+
+// ── TOAST ──
+function toast(msg, icon = '✅', type = 'success', sub = 'CodeForge AI') {
+  const container = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<div class="toast-icon">${icon}</div>
+    <div class="toast-body">
+      <div class="toast-msg">${msg}</div>
+      <div class="toast-sub">${sub}</div>
+    </div>`;
+  el.onclick = () => removeToast(el);
+  container.appendChild(el);
+  setTimeout(() => removeToast(el), 4000);
+}
+
+function removeToast(el) {
+  el.classList.add('out');
+  setTimeout(() => el.remove(), 300);
+}
+
+// ── MODE ──
+function setMode(el, mode, placeholder) {
+  document.querySelectorAll('.cmd-mode').forEach(m => m.classList.remove('active'));
+  el.classList.add('active');
+  state.mode = mode;
+  document.getElementById('current-mode-label').textContent = mode;
+  document.getElementById('cmd-input').placeholder = placeholder;
+}
+
+// ── TABS ──
+function switchTab(el, tab) {
+  document.querySelectorAll('.ttab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  state.currentTab = tab;
+
+  // Auto-set mode based on tab
+  const modeMap = {
+    project: 'مشروع', search: 'عام', fix: 'إصلاح',
+    database: 'قاعدة بيانات', security: 'أمان', agent: 'وكيل',
+    social: 'عام', dashboard: 'عام', reverse: 'عام'
+  };
+
+  const modeLabels = {
+    project: ['مشروع','صف مشروعك الكامل...'],
+    fix: ['إصلاح','الصق الكود المكسور + رسالة الخطأ...'],
+    database: ['قاعدة بيانات','صف احتياجات قاعدة بياناتك...'],
+    security: ['أمان','أدخل رابط أو كود للتحليل الأمني...'],
+    agent: ['وكيل','أعطِ الوكيل مهمة للتنفيذ...']
+  };
+
+  if (modeLabels[tab]) {
+    state.mode = modeLabels[tab][0];
+    document.getElementById('current-mode-label').textContent = modeLabels[tab][0];
+    document.getElementById('cmd-input').placeholder = modeLabels[tab][1];
+    document.querySelectorAll('.cmd-mode').forEach(m => {
+      if (m.textContent.includes(state.mode)) m.classList.add('active');
+      else m.classList.remove('active');
+    });
+  }
+}
+
+function setTool(el, tool) {
+  document.querySelectorAll('.sl-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── RIGHT SIDEBAR TABS ──
+function switchSrTab(el, panel) {
+  document.querySelectorAll('.sr-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sr-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sr-' + panel).classList.add('active');
+}
+
+// ── PROMPT HELPERS ──
+function setPrompt(text) {
+  const input = document.getElementById('cmd-input');
+  input.value = text;
+  autoResize(input);
+  input.focus();
+}
+
+function quickTool(tool) {
+  const prompts = {
+    project: 'أنشئ مشروعاً كاملاً من وصف: ',
+    database: 'أنشئ قاعدة بيانات كاملة لـ: ',
+    security: 'حلّل الثغرات الأمنية في: ',
+    agent: 'نفّذ هذه المهمة تلقائياً: ',
+    social: 'اشرح خوارزمية ',
+    fix: 'أصلح هذا الكود: ',
+    reverse: 'حلّل هذا التطبيق واستخرج أكواده: '
+  };
+  setPrompt(prompts[tool] || '');
+  toast(`تم اختيار أداة: ${tool}`,'🛠️','info');
+}
+
+function loadProject(name) {
+  toast(`تم فتح مشروع: ${name}`,'📂','info');
+  setPrompt(`أريد تطوير مشروع "${name}" وإضافة ميزات جديدة. ما الذي تقترحه؟`);
+}
+
+// ── AUTO RESIZE TEXTAREA ──
+function updateCount(el) {
+  const n = el.value.length;
+  const el2 = document.getElementById('char-count');
+  if (el2) el2.textContent = n > 0 ? n + ' حرف' : '0';
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+// ── KEYBOARD ──
+function handleKey(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runCommand();
+  }
+}
+
+// ── LOADING STATE ──
+function setLoading(on) {
+  state.isLoading = on;
+  const btn = document.getElementById('run-btn');
+  const icon = document.getElementById('run-icon');
+  const text = document.getElementById('run-text');
+  const fill = document.getElementById('progress-fill');
+
+  if (on) {
+    icon.textContent = '⏸';
+    text.textContent = 'جارٍ...';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+    fill.classList.add('running');
+  } else {
+    icon.textContent = '▶';
+    text.textContent = 'تشغيل';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    fill.classList.remove('running');
+  }
+}
+
+// ── FORMAT RESPONSE ──
+function formatResponse(text) {
+  // Escape HTML first
+  let out = text
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+
+  // Code blocks
+  out = out.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const langLabel = lang || 'code';
+    return `<div class="code-block">
+      <div class="code-block-header">
+        <div class="cb-dots">
+          <div class="cb-dot d-r"></div>
+          <div class="cb-dot d-y"></div>
+          <div class="cb-dot d-g"></div>
+        </div>
+        <span class="cb-lang">${langLabel}</span>
+        <button class="cb-copy" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <pre>${code.trim()}</pre>
+    </div>`;
+  });
+
+  // Inline code
+  out = out.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  // Bold
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  // Headers
+  out = out.replace(/^### (.+)$/gm,'<div style="font-size:0.82rem;font-weight:700;color:var(--g2);margin:14px 0 6px;border-bottom:1px solid var(--border);padding-bottom:4px">$1</div>');
+  out = out.replace(/^## (.+)$/gm,'<div style="font-size:0.9rem;font-weight:700;color:var(--g1);margin:16px 0 8px">$1</div>');
+  out = out.replace(/^# (.+)$/gm,'<div style="font-size:1rem;font-weight:800;color:var(--g1);margin:16px 0 8px">$1</div>');
+  // Lists
+  out = out.replace(/^[-•] (.+)$/gm,'<div style="display:flex;gap:8px;margin:3px 0"><span style="color:var(--g1);flex-shrink:0">▸</span><span>$1</span></div>');
+  out = out.replace(/^\d+\. (.+)$/gm,'<div style="display:flex;gap:8px;margin:3px 0"><span style="color:var(--g2);flex-shrink:0;font-family:var(--mono);font-size:0.75rem">$&</span></div>');
+  // Line breaks
+  out = out.replace(/\n\n/g, '<br><br>');
+  out = out.replace(/\n/g, '<br>');
+
+  return out;
+}
+
+// ── ADD MESSAGE ──
+function addMessage(role, content, isHTML = false) {
+  const area = document.getElementById('messages-area');
+  const es = document.getElementById('empty-state');
+  if (es) es.remove();
+
+  const msg = document.createElement('div');
+  msg.className = `msg ${role === 'user' ? 'msg-user' : ''}`;
+
+  const av = document.createElement('div');
+  av.className = `msg-av ${role === 'user' ? 'av-user' : 'av-ai'}`;
+  av.textContent = role === 'user' ? 'م' : '⚡';
+
+  const bubble = document.createElement('div');
+  bubble.className = `msg-bubble ${role === 'user' ? 'bubble-user' : 'bubble-ai'}`;
+
+  if (isHTML) {
+    bubble.innerHTML = content;
+  } else {
+    bubble.textContent = content;
+  }
+
+  // Actions for AI messages
+  if (role === 'ai') {
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    meta.innerHTML = `<span>${new Date().toLocaleTimeString('ar')}</span> • <span>claude-sonnet-4</span>`;
+
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+    actions.innerHTML = `
+      <button class="msg-act-btn" onclick="copyMsg(this)">📋 نسخ</button>
+      <button class="msg-act-btn" onclick="saveMsg(this)">💾 حفظ</button>
+      <button class="msg-act-btn" onclick="rerun()">🔄 إعادة</button>
+    `;
+
+    bubble.appendChild(meta);
+    bubble.appendChild(actions);
+  }
+
+  msg.appendChild(av);
+  msg.appendChild(bubble);
+  area.appendChild(msg);
+  area.scrollTop = area.scrollHeight;
+
+  return msg;
+}
+
+// ── TYPING INDICATOR ──
+function addTyping() {
+  const area = document.getElementById('messages-area');
+  const el = document.createElement('div');
+  el.className = 'typing-row';
+  el.id = 'typing-indicator';
+  el.innerHTML = `
+    <div class="msg-av av-ai">⚡</div>
+    <div class="typing-dots">
+      <div class="td"></div><div class="td"></div><div class="td"></div>
+    </div>`;
+  area.appendChild(el);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  document.getElementById('typing-indicator')?.remove();
+}
+
+// ── MAIN COMMAND RUNNER ──
+async function runCommand() {
+  if (state.isLoading) return;
+
+  const input = document.getElementById('cmd-input');
+  const text = input.value.trim();
+
+  if (!text) {
+    toast('اكتب طلبك أولاً!', '⚠️', 'error');
+    input.focus();
+    return;
+  }
+
+  // Add user message
+  addMessage('user', text);
+  input.value = '';
+  autoResize(input);
+
+  // Store in history
+  state.messages.push({ role: 'user', content: buildPromptForMode(text) });
+
+  setLoading(true);
+  addTyping();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPTS[state.mode] || SYSTEM_PROMPTS['عام'],
+        messages: state.messages.slice(-10) // last 10 for context
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    const aiText = data.content?.map(b => b.text || '').join('') || 'لم أتمكن من الحصول على رد.';
+
+    removeTyping();
+    addMessage('ai', formatResponse(aiText), true);
+    state.messages.push({ role: 'assistant', content: aiText });
+    toast('تم الرد بنجاح', '✅', 'success');
+
+  } catch (err) {
+    removeTyping();
+    addMessage('ai', formatResponse(`**خطأ في الاتصال**\n\n${err.message}\n\nتحقق من الاتصال وحاول مجدداً.`), true);
+    toast('خطأ في الاتصال بالـ API', '❌', 'error');
+  }
+
+  SESSION.save();
+  setLoading(false);
+}
+
+function buildPromptForMode(text) {
+  const prefixes = {
+    'كود': `اكتب لي كوداً يُنفذ: ${text}`,
+    'مشروع': `أنشئ مشروعاً كاملاً: ${text}`,
+    'إصلاح': `أصلح هذا الكود/الخطأ: ${text}`,
+    'قاعدة بيانات': `أنشئ قاعدة بيانات لـ: ${text}`,
+    'أمان': `حلّل الأمان وابحث عن الثغرات في: ${text}`,
+    'وكيل': `نفّذ هذه المهمة: ${text}`
+  };
+  return prefixes[state.mode] || text;
+}
+
+// ── HELPERS ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent || '');
+  btn.textContent = 'تم ✓';
+  setTimeout(() => btn.textContent = 'نسخ', 2000);
+  toast('تم نسخ الكود!', '📋', 'success');
+}
+
+function copyMsg(btn) {
+  const bubble = btn.closest('.msg-bubble');
+  navigator.clipboard.writeText(bubble.innerText || '');
+  toast('تم النسخ!', '📋', 'success');
+}
+
+function saveMsg(btn) {
+  toast('تم حفظ الرد في المشاريع!', '💾', 'success');
+}
+
+function rerun() {
+  if (state.messages.length >= 2) {
+    const last = state.messages[state.messages.length - 2];
+    if (last?.role === 'user') {
+      document.getElementById('cmd-input').value = last.content;
+      runCommand();
+    }
+  }
+}
+
+function clearChat() {
+  state.messages = [];
+  const area = document.getElementById('messages-area');
+  area.innerHTML = '';
+
+  const es = document.createElement('div');
+  es.className = 'empty-state';
+  es.id = 'empty-state';
+  es.innerHTML = `
+    <div class="es-icon">⚡</div>
+    <div class="es-title">CodeForge AI — Elite Engine</div>
+    <div class="es-sub">المحادثة تمت إعادة تعيينها. ابدأ من جديد.</div>
+  `;
+  area.appendChild(es);
+  toast('تم مسح المحادثة', '🗑️', 'info');
+}
+
+function exportChat() {
+  if (state.messages.length === 0) { toast('لا توجد محادثة للتصدير', '⚠️', 'error'); return; }
+  let text = 'CodeForge AI — تصدير المحادثة\n';
+  text += '='.repeat(40) + '\n\n';
+  state.messages.forEach(m => {
+    text += m.role === 'user' ? '👤 أنت:\n' : '⚡ CodeForge:\n';
+    text += m.content + '\n\n' + '-'.repeat(30) + '\n\n';
+  });
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='codeforge-chat.txt'; a.click();
+  toast('تم تصدير المحادثة!', '📄', 'success');
+}
+
+function saveSession() {
+  const data = JSON.stringify(state.messages, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'codeforge-session.json'; a.click();
+  toast('تم حفظ الجلسة!', '💾', 'success');
+}
+
+function attachFile() { toast('ارفع ملف كود أو APK أو ZIP للتحليل', '📎', 'info'); }
+function attachURL() {
+  const url = prompt('أدخل رابط الموقع أو GitHub repo:');
+  if (url) {
+    document.getElementById('cmd-input').value += `\n\nالرابط: ${url}`;
+    toast('تم إضافة الرابط', '🔗', 'success');
+  }
+}
+function attachGithub() {
+  const repo = prompt('أدخل رابط GitHub repo:');
+  if (repo) {
+    document.getElementById('cmd-input').value += `\n\nGitHub repo: ${repo}`;
+    toast('تم ربط GitHub', '🐙', 'success');
+  }
+}
+
+// ── MOBILE NAV ──
+// ── THEME TOGGLE ──
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('theme-btn').textContent = isLight ? '☀️' : '🌙';
+  toast(isLight ? 'الوضع الفاتح' : 'الوضع الداكن', isLight ? '☀️' : '🌙', 'info');
+}
+
+function mobileNav(el, mode, placeholder) {
+  document.querySelectorAll('.mn-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  state.mode = mode;
+  document.getElementById('current-mode-label').textContent = mode;
+  document.getElementById('cmd-input').placeholder = placeholder;
+  document.getElementById('cmd-input').focus();
+}
+
+// ── PWA INSTALL ──
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+
+document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    // Show manual instructions
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      toast('iOS: اضغط زر المشاركة ثم "إضافة إلى الشاشة الرئيسية"','📱','info','تثبيت التطبيق');
+    } else {
+      toast('Chrome: اضغط ⋮ ثم "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"','📲','info','تثبيت التطبيق');
+    }
+    return;
+  }
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+  if (result.outcome === 'accepted') {
+    toast('تم تثبيت CodeForge AI بنجاح! 🎉','⚡','success');
+    closeBanner();
+  }
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  toast('CodeForge AI مثبّت على جهازك!','✅','success');
+  closeBanner();
+});
+
+function closeBanner() {
+  document.getElementById('install-banner').classList.remove('show');
+}
+
+// ── SERVICE WORKER (full offline + caching) ──
+if ('serviceWorker' in navigator) {
+  const CACHE = 'codeforge-v1';
+  const swCode = `
+const CACHE_NAME = 'codeforge-v1';
+const ASSETS = ['/'];
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS).catch(()=>{}))
+  );
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  if (e.request.url.includes('anthropic.com')) return; // don't cache API
+  e.respondWith(
+    fetch(e.request)
+      .then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
+});`;
+
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL)
+    .then(() => console.log('SW registered'))
+    .catch(e => console.log('SW error:', e));
+}
+
+// ── SESSION PERSISTENCE (memory within tab) ──
+const SESSION = {
+  save() {
+    try { sessionStorage.setItem('cf_msgs', JSON.stringify(state.messages.slice(-20))); } catch(e){}
+  },
+  load() {
+    try {
+      const d = sessionStorage.getItem('cf_msgs');
+      if (d) state.messages = JSON.parse(d);
+    } catch(e){}
+  }
+};
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  SESSION.load();
+  setTimeout(() => {
+    toast('مرحباً! اكتب طلبك البرمجي وسأنجزه فوراً 🔥', '⚡', 'success', 'CodeForge AI v2 — جاهز');
+  
+  // Restore session if exists
+  if (state.messages.length > 0) {
+    const area = document.getElementById('messages-area');
+    const es = document.getElementById('empty-state');
+    if (es) es.remove();
+    state.messages.forEach(m => {
+      if (m.role === 'user') addMessage('user', m.content);
+      else if (m.role === 'assistant') addMessage('ai', formatResponse(m.content), true);
+    });
+    toast('تم استعادة المحادثة السابقة', '💾', 'info');
+  }
+  }, 800);
+});
+</script>
+</body>
+</html>
